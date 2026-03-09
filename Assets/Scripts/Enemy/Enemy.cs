@@ -5,6 +5,7 @@ public class Enemy : MonoBehaviour
 {
     public static event Action<Enemy> Spawned;
     public static event Action<Enemy> Died;
+    public static event Action<Enemy> Escaped;
 
     [SerializeField] private EnemyData data;
 
@@ -24,6 +25,12 @@ public class Enemy : MonoBehaviour
         currentWaypointIndex = 0;
         initialized = true;
 
+        if (waypoints != null && waypoints.Length > 0)
+        {
+            transform.position = waypoints[0].position;
+            currentWaypointIndex = 1;
+        }
+
         Spawned?.Invoke(this);
     }
 
@@ -36,17 +43,11 @@ public class Enemy : MonoBehaviour
 
         if (currentWaypointIndex >= waypoints.Length)
         {
-            // 목적지 도달 시 제거하지 않고 경로를 계속 순환한다.
-            currentWaypointIndex = 0;
-        }
-
-        Transform target = waypoints[currentWaypointIndex];
-        if (target == null)
-        {
-            currentWaypointIndex++;
+            ReachGoal();
             return;
         }
 
+        Transform target = waypoints[currentWaypointIndex];
         transform.position = Vector2.MoveTowards(transform.position, target.position, moveSpeed * Time.deltaTime);
 
         if (Vector2.Distance(transform.position, target.position) <= 0.01f)
@@ -72,6 +73,12 @@ public class Enemy : MonoBehaviour
     private void Die()
     {
         Died?.Invoke(this);
+        Destroy(gameObject);
+    }
+
+    private void ReachGoal()
+    {
+        Escaped?.Invoke(this);
         Destroy(gameObject);
     }
 }

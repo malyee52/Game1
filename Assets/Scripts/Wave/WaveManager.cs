@@ -25,12 +25,14 @@ public class WaveManager : MonoBehaviour
     {
         Enemy.Spawned += HandleEnemySpawned;
         Enemy.Died += HandleEnemyRemoved;
+        Enemy.Escaped += HandleEnemyRemoved;
     }
 
     private void OnDisable()
     {
         Enemy.Spawned -= HandleEnemySpawned;
         Enemy.Died -= HandleEnemyRemoved;
+        Enemy.Escaped -= HandleEnemyRemoved;
     }
 
     public void StartNextWave()
